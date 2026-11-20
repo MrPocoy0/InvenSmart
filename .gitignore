@@ -1,0 +1,35 @@
+
+# Variables de entorno y credenciales
+.env
+.env.*
+!.env.example
+
+# Entornos virtuales
+.venv/
+venv/
+
+# Archivos temporales de Python
+__pycache__/
+*.py[cod]
+
+# Bases de datos, respaldos y archivos locales
+*.sql
+*.sqlite
+*.sqlite3
+*.db
+*.bak
+*.backup
+*.tmp
+*.temp
+*.log
+*.local
+backups/
+secrets/
+credentials/
+
+# Configuración local de IDE
+.idea/
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db

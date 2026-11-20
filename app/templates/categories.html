@@ -1,0 +1,366 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categorías | InvenSmart</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="app-container">
+
+    <!-- MENU LATERAL -->
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="brand-icon">I</div>
+            <div>
+                <h2>InvenSmart</h2>
+                <span>Gestión inteligente</span>
+            </div>
+        </div>
+
+        <nav class="navigation">
+
+            <span class="menu-label">PRINCIPAL</span>
+
+            <a href="{{ url_for('main.home') }}" class="nav-link">
+                <span>▦</span> Dashboard
+            </a>
+
+            <a href="{{ url_for('product.list_products') }}"
+               class="nav-link">
+                <span>▤</span> Productos
+            </a>
+
+            <a href="#" class="nav-link">
+                <span>⇄</span> Movimientos
+            </a>
+
+            <a href="{{ url_for('expiry.list_expirations') }}"
+   class="nav-link">
+    <span>◷</span> Vencimientos
+</a>
+
+            <span class="menu-label">GESTIÓN</span>
+
+            <a href="{{ url_for('category.list_categories') }}"
+               class="nav-link active">
+                <span>♧</span> Categorías
+            </a>
+
+            <a href="#" class="nav-link">
+                <span>♧</span> Alertas
+            </a>
+
+            <a href="#" class="nav-link">
+                <span>▥</span> Reportes
+            </a>
+
+            <a href="#" class="nav-link">
+                <span>✧</span> Asistente IA
+            </a>
+
+        </nav>
+
+        <div class="sidebar-footer">
+            <span>Proyecto académico</span>
+            <strong>InvenSmart v1.0</strong>
+        </div>
+
+    </aside>
+
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="main-content">
+
+        <header class="topbar">
+
+            <div>
+                <h1>Categorías</h1>
+                <p>Organiza los productos de tu inventario.</p>
+            </div>
+
+            <div class="user-profile">
+                <div class="avatar">A</div>
+                <div>
+                    <strong>Administrador</strong>
+                    <span>Usuario del sistema</span>
+                </div>
+            </div>
+
+        </header>
+
+
+        <!-- MENSAJES -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="category-message {{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+
+        <!-- BANNER -->
+        <section class="welcome-section">
+
+            <div>
+                <h2>Gestión de categorías</h2>
+                <p>
+                    Clasifica tus productos para mantener
+                    organizado tu inventario.
+                </p>
+            </div>
+
+            <span class="demo-label">GESTIÓN DE INVENTARIO</span>
+
+        </section>
+
+
+        <!-- FORMULARIO DE REGISTRO -->
+        <section class="panel category-form-panel">
+
+            <div class="panel-header">
+                <div>
+                    <h3>Registrar nueva categoría</h3>
+                    <p>Completa los datos de la categoría.</p>
+                </div>
+            </div>
+
+            <form method="POST"
+                  action="{{ url_for('category.create_category') }}">
+
+                <div class="category-form-grid">
+
+                    <div class="form-group">
+                        <label for="name">Nombre de la categoría *</label>
+
+                        <input
+                            type="text"
+                            id="name"
+                            name="name"
+                            placeholder="Ej. Lácteos"
+                            maxlength="100"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Descripción</label>
+
+                        <input
+                            type="text"
+                            id="description"
+                            name="description"
+                            placeholder="Describe la categoría..."
+                            maxlength="255"
+                        >
+                    </div>
+
+                </div>
+
+                <div class="category-form-actions">
+                    <button type="submit" class="category-button">
+                        + Registrar categoría
+                    </button>
+                </div>
+
+            </form>
+
+        </section>
+
+
+        <!-- LISTADO DE CATEGORÍAS -->
+        <section class="panel category-list-panel">
+
+            <div class="panel-header">
+                <div>
+                    <h3>Listado de categorías</h3>
+                    <p>Consulta y administra las categorías registradas.</p>
+                </div>
+            </div>
+
+            <div class="category-table-container">
+
+                <table class="category-table">
+
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th>Productos asociados</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for category in categories %}
+
+                        <tr>
+
+                            <td>#{{ category.id }}</td>
+
+                            <td>
+                                <strong>{{ category.name }}</strong>
+                            </td>
+
+                            <td>
+                                {{ category.description or 'Sin descripción' }}
+                            </td>
+
+                            <td>
+                                <span class="category-count">
+                                    {{ category.products|length }}
+                                </span>
+                            </td>
+
+                            <td>
+
+                                <div class="category-actions">
+
+                                    <button
+                                        type="button"
+                                        class="category-edit-button"
+                                        onclick="toggleEdit({{ category.id }})">
+                                        Editar
+                                    </button>
+
+                                    <form
+                                        method="POST"
+                                        action="{{ url_for('category.delete_category', category_id=category.id) }}"
+                                        onsubmit="return confirm('¿Seguro que deseas eliminar esta categoría?');">
+
+                                        <button
+                                            type="submit"
+                                            class="category-delete-button">
+                                            Eliminar
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                        <!-- FORMULARIO DE EDICIÓN -->
+                        <tr id="edit-{{ category.id }}"
+                            class="category-edit-row"
+                            style="display: none;">
+
+                            <td colspan="5">
+
+                                <form
+                                    method="POST"
+                                    action="{{ url_for('category.edit_category', category_id=category.id) }}">
+
+                                    <div class="category-form-grid">
+
+                                        <div class="form-group">
+                                            <label>Nombre</label>
+
+                                            <input
+                                                type="text"
+                                                name="name"
+                                                value="{{ category.name }}"
+                                                maxlength="100"
+                                                required
+                                            >
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Descripción</label>
+
+                                            <input
+                                                type="text"
+                                                name="description"
+                                                value="{{ category.description or '' }}"
+                                                maxlength="255"
+                                            >
+                                        </div>
+
+                                    </div>
+
+                                    <div class="category-form-actions">
+
+                                        <button
+                                            type="submit"
+                                            class="category-button">
+                                            Guardar cambios
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            class="category-cancel-button"
+                                            onclick="toggleEdit({{ category.id }})">
+                                            Cancelar
+                                        </button>
+
+                                    </div>
+
+                                </form>
+
+                            </td>
+
+                        </tr>
+
+                        {% else %}
+
+                        <tr>
+                            <td colspan="5" class="category-empty">
+                                Todavía no hay categorías registradas.
+                            </td>
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <div class="category-summary">
+                Categorías registradas:
+                <strong>{{ categories|length }}</strong>
+            </div>
+
+        </section>
+
+
+        <footer class="footer">
+            InvenSmart © 2026 - Sistema Inteligente de Gestión de Inventarios
+        </footer>
+
+    </main>
+
+</div>
+
+
+<script>
+    function toggleEdit(categoryId) {
+
+        const row = document.getElementById("edit-" + categoryId);
+
+        if (row.style.display === "none") {
+            row.style.display = "table-row";
+        } else {
+            row.style.display = "none";
+        }
+
+    }
+</script>
+
+</body>
+</html>

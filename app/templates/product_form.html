@@ -1,0 +1,364 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ page_title }} | InvenSmart</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="app-container">
+
+    <!-- MENU LATERAL -->
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="brand-icon">I</div>
+
+            <div>
+                <h2>InvenSmart</h2>
+                <span>Gestión inteligente</span>
+            </div>
+        </div>
+
+        <nav class="navigation">
+
+            <span class="menu-label">PRINCIPAL</span>
+
+            <a href="{{ url_for('main.home') }}" class="nav-link">
+                <span>▦</span> Dashboard
+            </a>
+
+            <a href="{{ url_for('product.list_products') }}"
+               class="nav-link active">
+                <span>▤</span> Productos
+            </a>
+
+            <a href="#" class="nav-link">
+                <span>⇄</span> Movimientos
+            </a>
+
+            <a href="#" class="nav-link">
+                <span>◷</span> Vencimientos
+            </a>
+
+            <span class="menu-label">GESTIÓN</span>
+
+            <a href="#" class="nav-link">
+                <span>♧</span> Alertas
+            </a>
+
+            <a href="#" class="nav-link">
+                <span>▥</span> Reportes
+            </a>
+
+            <a href="#" class="nav-link">
+                <span>✧</span> Asistente IA
+            </a>
+
+        </nav>
+
+        <div class="sidebar-footer">
+            <span>Proyecto académico</span>
+            <strong>InvenSmart v1.0</strong>
+        </div>
+
+    </aside>
+
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="main-content">
+
+        <header class="topbar">
+
+            <div>
+                <h1>{{ page_title }}</h1>
+                <p>Completa la información del producto</p>
+            </div>
+
+            <div class="user-profile">
+
+                <div class="avatar">A</div>
+
+                <div>
+                    <strong>Administrador</strong>
+                    <span>Usuario del sistema</span>
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- FORMULARIO -->
+        <section class="panel form-panel">
+
+            <div class="panel-header">
+                <div>
+                    <h3>Información del producto</h3>
+                    <p>Los campos marcados con * son obligatorios</p>
+                </div>
+            </div>
+
+
+            <!-- MENSAJES DEL SISTEMA -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+
+                {% if messages %}
+
+                    {% for category, message in messages %}
+
+                        <div class="flash-message {{ category }}">
+                            {{ message }}
+                        </div>
+
+                    {% endfor %}
+
+                {% endif %}
+
+            {% endwith %}
+
+
+            <!-- FORMULARIO DE PRODUCTO -->
+            <form method="POST"
+                  action="{{ request.path }}"
+                  class="product-form">
+
+                <div class="form-grid">
+
+
+                    <!-- CODIGO -->
+                    <div class="form-group">
+
+                        <label for="code">Código del producto *</label>
+
+                        <input
+                            type="text"
+                            id="code"
+                            name="code"
+                            maxlength="50"
+                            placeholder="Ej. PROD-001"
+                            value="{{ request.form.get('code', product.code if product else '') }}"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- NOMBRE -->
+                    <div class="form-group">
+
+                        <label for="name">Nombre del producto *</label>
+
+                        <input
+                            type="text"
+                            id="name"
+                            name="name"
+                            maxlength="150"
+                            placeholder="Ej. Leche evaporada"
+                            value="{{ request.form.get('name', product.name if product else '') }}"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- PRECIO DE COMPRA -->
+                    <div class="form-group">
+
+                        <label for="purchase_price">
+                            Precio de compra (S/) *
+                        </label>
+
+                        <input
+                            type="number"
+                            id="purchase_price"
+                            name="purchase_price"
+                            min="0"
+                            step="0.01"
+                            value="{{ request.form.get('purchase_price', product.purchase_price if product else '0') }}"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- PRECIO DE VENTA -->
+                    <div class="form-group">
+
+                        <label for="sale_price">
+                            Precio de venta (S/) *
+                        </label>
+
+                        <input
+                            type="number"
+                            id="sale_price"
+                            name="sale_price"
+                            min="0"
+                            step="0.01"
+                            value="{{ request.form.get('sale_price', product.sale_price if product else '0') }}"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- STOCK -->
+                    <div class="form-group">
+
+                        <label for="stock">Stock inicial *</label>
+
+                        <input
+                            type="number"
+                            id="stock"
+                            name="stock"
+                            min="0"
+                            step="1"
+                            value="{{ request.form.get('stock', product.stock if product else '0') }}"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- STOCK MINIMO -->
+                    <div class="form-group">
+
+                        <label for="minimum_stock">Stock mínimo *</label>
+
+                        <input
+                            type="number"
+                            id="minimum_stock"
+                            name="minimum_stock"
+                            min="0"
+                            step="1"
+                            value="{{ request.form.get('minimum_stock', product.minimum_stock if product else '5') }}"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- FECHA DE VENCIMIENTO -->
+                    <div class="form-group">
+
+                        <label for="expiration_date">
+                            Fecha de vencimiento
+                        </label>
+
+                        <input
+                            type="date"
+                            id="expiration_date"
+                            name="expiration_date"
+                            value="{{ request.form.get('expiration_date', product.expiration_date.isoformat() if product and product.expiration_date else '') }}"
+                        >
+
+                    </div>
+
+
+                    <!-- CATEGORIA -->
+                    <div class="form-group">
+
+                        <label for="category_id">Categoría *</label>
+
+                        {% if request.method == 'POST' %}
+
+                            {% set selected_category_id = request.form.get('category_id', '') %}
+
+                        {% elif product %}
+
+                            {% set selected_category_id = product.category_id|string %}
+
+                        {% else %}
+
+                            {% set selected_category_id = '' %}
+
+                        {% endif %}
+
+
+                        <select
+                            id="category_id"
+                            name="category_id"
+                            required
+                        >
+
+                            <option value="">
+                                Seleccionar categoría
+                            </option>
+
+                            {% for category in categories %}
+
+                                <option
+                                    value="{{ category.id }}"
+                                    {% if selected_category_id == category.id|string %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    {{ category.name }}
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- DESCRIPCION -->
+                    <div class="form-group full-width">
+
+                        <label for="description">Descripción</label>
+
+                        <textarea
+                            id="description"
+                            name="description"
+                            rows="4"
+                            placeholder="Describe las características del producto..."
+                        >{{ request.form.get('description', product.description if product and product.description else '') }}</textarea>
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- BOTONES -->
+                <div class="form-actions">
+
+                    <a href="{{ url_for('product.list_products') }}"
+                       class="secondary-button">
+                        Cancelar
+                    </a>
+
+                    <button type="submit" class="primary-button">
+                        {% if product %}
+                            Actualizar producto
+                        {% else %}
+                            Guardar producto
+                        {% endif %}
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+
+        <!-- PIE DE PAGINA -->
+        <footer class="footer">
+            InvenSmart © 2026 - Sistema Inteligente de Gestión de Inventarios
+        </footer>
+
+    </main>
+
+</div>
+
+</body>
+</html>

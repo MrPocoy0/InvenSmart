@@ -1,0 +1,241 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productos | InvenSmart</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="app-container">
+
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">I</div>
+            <div>
+                <h2>InvenSmart</h2>
+                <span>Gestión inteligente</span>
+            </div>
+        </div>
+
+        <nav class="navigation">
+            <span class="menu-label">PRINCIPAL</span>
+
+            <a href="/" class="nav-link">
+                <span>▦</span> Dashboard
+            </a>
+
+            <a href="{{ url_for('product.list_products') }}" class="nav-link active">
+                <span>▤</span> Productos
+            </a>
+
+            <a href="#" class="nav-link">
+                <span>⇄</span> Movimientos
+            </a>
+
+            <a href="{{ url_for('expiry.list_expirations') }}" class="nav-link">
+    <span>◷</span> Vencimientos
+</a>
+
+            <span class="menu-label">GESTIÓN</span>
+
+<a href="{{ url_for('category.list_categories') }}"
+   class="nav-link">
+    <span>♧</span> Categorías
+</a>
+
+<a href="#" class="nav-link">
+    <span>♧</span> Alertas
+</a>
+
+            <a href="#" class="nav-link">
+                <span>▥</span> Reportes
+            </a>
+
+            <a href="#" class="nav-link">
+                <span>✧</span> Asistente IA
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <span>Proyecto académico</span>
+            <strong>InvenSmart v1.0</strong>
+        </div>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <div>
+                <h1>Productos</h1>
+                <p>Administra y controla los productos de tu inventario.</p>
+            </div>
+
+            <div class="user-profile">
+                <div class="avatar">A</div>
+                <div>
+                    <strong>Administrador</strong>
+                    <span>Usuario del sistema</span>
+                </div>
+            </div>
+        </header>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert-message {{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <section class="welcome-section">
+            <div>
+                <h2>Control de productos</h2>
+                <p>Registra, consulta y administra los productos de tu negocio.</p>
+            </div>
+            <span class="demo-label">GESTIÓN DE INVENTARIO</span>
+        </section>
+
+        <section class="panel products-panel">
+
+            <div class="products-toolbar">
+                <div>
+                    <h3>Listado de productos</h3>
+                    <p>Consulta los productos registrados en el sistema.</p>
+                </div>
+
+                <a href="{{ url_for('product.create_product') }}"
+                   class="action-button">
+                    + Nuevo producto
+                </a>
+            </div>
+
+            <form method="GET"
+                  action="{{ url_for('product.list_products') }}"
+                  class="search-form">
+
+                <input
+                    type="text"
+                    name="q"
+                    placeholder="Buscar por código o nombre..."
+                    value="{{ search }}"
+                >
+
+                <button type="submit" class="search-button">
+                    Buscar
+                </button>
+
+                {% if search %}
+                    <a href="{{ url_for('product.list_products') }}"
+                       class="clear-button">
+                        Limpiar
+                    </a>
+                {% endif %}
+            </form>
+
+            <div class="table-container">
+                <table class="products-table">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Producto</th>
+                            <th>Categoría</th>
+                            <th>Precio venta</th>
+                            <th>Stock</th>
+                            <th>Vencimiento</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for product in products %}
+                            <tr>
+                                <td>{{ product.code }}</td>
+
+                                <td>
+                                    <strong>{{ product.name }}</strong>
+                                    {% if product.description %}
+                                        <small>{{ product.description }}</small>
+                                    {% endif %}
+                                </td>
+
+                                <td>{{ product.category.name }}</td>
+
+                                <td>
+                                    S/ {{ "%.2f"|format(product.sale_price) }}
+                                </td>
+
+                                <td>{{ product.stock }}</td>
+
+                                <td>
+                                    {% if product.expiration_date %}
+                                        {{ product.expiration_date.strftime('%d/%m/%Y') }}
+                                    {% else %}
+                                        <span class="muted-text">No aplica</span>
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    {% if product.stock == 0 %}
+                                        <span class="status danger">Sin stock</span>
+                                    {% elif product.stock <= product.minimum_stock %}
+                                        <span class="status warning">Stock bajo</span>
+                                    {% else %}
+                                        <span class="status available">Disponible</span>
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    <div class="table-actions">
+                                        <a href="{{ url_for('product.edit_product', product_id=product.id) }}"
+                                           class="edit-button">
+                                            Editar
+                                        </a>
+
+                                        <form method="POST"
+                                              action="{{ url_for('product.delete_product', product_id=product.id) }}"
+                                              onsubmit="return confirm('¿Estás seguro de eliminar este producto?');">
+
+                                            <button type="submit" class="delete-button">
+                                                Eliminar
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+
+                        {% else %}
+                            <tr>
+                                <td colspan="8" class="empty-state">
+                                    {% if search %}
+                                        No se encontraron productos para "{{ search }}".
+                                    {% else %}
+                                        Todavía no hay productos registrados.
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="table-summary">
+                Productos encontrados: <strong>{{ products|length }}</strong>
+            </div>
+
+        </section>
+
+        <footer class="footer">
+            InvenSmart © 2026 - Sistema Inteligente de Gestión de Inventarios
+        </footer>
+
+    </main>
+</div>
+
+</body>
+</html>

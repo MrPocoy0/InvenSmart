@@ -1,0 +1,337 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>InvenSmart | Gestión Inteligente</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="app-container">
+
+    <!-- =========================================
+         MENU LATERAL
+    ========================================== -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="brand-icon">I</div>
+
+            <div>
+                <h2>InvenSmart</h2>
+                <span>Gestión inteligente</span>
+            </div>
+        </div>
+
+        <nav class="navigation">
+
+            <span class="menu-label">PRINCIPAL</span>
+
+            <a href="/" class="nav-link active">
+                <span>▦</span>
+                Dashboard
+            </a>
+
+<a href="{{ url_for('product.list_products') }}" class="nav-link">
+    <span>▤</span> Productos
+</a>
+            <a href="#" class="nav-link">
+                <span>⇄</span>
+                Movimientos
+            </a>
+
+            <a href="{{ url_for('expiry.list_expirations') }}" class="nav-link">
+    <span>◷</span>
+    Vencimientos
+</a>
+
+            <span class="menu-label">GESTIÓN</span>
+
+<a href="{{ url_for('category.list_categories') }}"
+   class="nav-link">
+    <span>♧</span> Categorías
+</a>
+
+<a href="#" class="nav-link">
+    <span>♧</span> Alertas
+</a>
+
+            <a href="#" class="nav-link">
+                <span>▥</span>
+                Reportes
+            </a>
+
+            <a href="#" class="nav-link">
+                <span>✧</span>
+                Asistente IA
+            </a>
+
+        </nav>
+
+        <div class="sidebar-footer">
+            <span>PROYECTO ACADÉMICO</span>
+            <strong>InvenSmart v1.0</strong>
+        </div>
+
+    </aside>
+
+
+    <!-- =========================================
+         CONTENIDO PRINCIPAL
+    ========================================== -->
+
+    <main class="main-content">
+
+        <!-- ENCABEZADO -->
+
+        <header class="topbar">
+
+            <div>
+                <h1>Dashboard</h1>
+                <p>Resumen general de tu inventario</p>
+            </div>
+
+            <div class="user-profile">
+
+                <div class="avatar">A</div>
+
+                <div>
+                    <strong>Administrador</strong>
+                    <span>Usuario del sistema</span>
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- BIENVENIDA -->
+
+        <section class="welcome-section">
+
+            <div>
+                <h2>Bienvenido a InvenSmart</h2>
+
+                <p>
+                    Controla tus productos y previene pérdidas
+                    desde un solo lugar.
+                </p>
+            </div>
+
+            <span class="demo-label">
+                DATOS DE DEMOSTRACIÓN
+            </span>
+
+        </section>
+
+
+        <!-- =====================================
+             INDICADORES DEL INVENTARIO
+        ====================================== -->
+
+        <section class="stats-grid">
+
+            <article class="stat-card">
+
+                <div class="stat-icon blue">▤</div>
+
+                <span>Total de productos</span>
+
+                <h3>250</h3>
+
+                <p>Productos registrados</p>
+
+            </article>
+
+
+            <article class="stat-card">
+
+                <div class="stat-icon green">✓</div>
+
+                <span>Stock disponible</span>
+
+                <h3>185</h3>
+
+                <p>Productos con existencias</p>
+
+            </article>
+
+
+            <article class="stat-card">
+
+                <div class="stat-icon orange">!</div>
+
+                <span>Stock bajo</span>
+
+                <h3>12</h3>
+
+                <p>Requieren atención</p>
+
+            </article>
+
+
+            <article class="stat-card">
+
+                <div class="stat-icon red">◷</div>
+
+                <span>Próximos a vencer</span>
+
+                <h3>8</h3>
+
+                <p>Requieren seguimiento</p>
+
+            </article>
+
+        </section>
+
+
+        <!-- =====================================
+             ALERTAS Y ASISTENTE IA
+        ====================================== -->
+
+        <section class="dashboard-grid">
+
+
+            <!-- ALERTAS DE INVENTARIO -->
+
+            <article class="panel">
+
+                <div class="panel-header">
+
+                    <div>
+                        <h3>Alertas de inventario</h3>
+
+                        <p>
+                            Productos que requieren atención
+                        </p>
+                    </div>
+
+                    <a href="#">Ver todas</a>
+
+                </div>
+
+
+                <div class="alert-item">
+
+                    <div class="alert-dot red-dot"></div>
+
+                    <div>
+                        <strong>Leche evaporada</strong>
+
+                        <p>
+                            Stock por debajo del mínimo
+                        </p>
+                    </div>
+
+                    <span class="status danger">
+                        Stock bajo
+                    </span>
+
+                </div>
+
+
+                <div class="alert-item">
+
+                    <div class="alert-dot orange-dot"></div>
+
+                    <div>
+                        <strong>Yogurt natural</strong>
+
+                        <p>
+                            Próximo a vencer en 4 días
+                        </p>
+                    </div>
+
+                    <span class="status warning">
+                        Vencimiento
+                    </span>
+
+                </div>
+
+
+                <div class="alert-item">
+
+                    <div class="alert-dot orange-dot"></div>
+
+                    <div>
+                        <strong>Queso fresco</strong>
+
+                        <p>
+                            Próximo a vencer en 6 días
+                        </p>
+                    </div>
+
+                    <span class="status warning">
+                        Vencimiento
+                    </span>
+
+                </div>
+
+            </article>
+
+
+            <!-- ASISTENTE INTELIGENTE -->
+
+            <article class="panel">
+
+                <div class="panel-header">
+
+                    <div>
+                        <h3>Asistente inteligente</h3>
+
+                        <p>
+                            Prevención de pérdidas mediante IA
+                        </p>
+                    </div>
+
+                    <span class="ai-label">IA</span>
+
+                </div>
+
+
+                <div class="ai-content">
+
+                    <div class="ai-icon">✧</div>
+
+                    <h4>Analiza tu inventario</h4>
+
+                    <p>
+                        El asistente podrá analizar los riesgos
+                        de vencimiento y stock para generar
+                        recomendaciones personalizadas.
+                    </p>
+
+                    <button
+                        type="button"
+                        class="primary-button"
+                        disabled
+                    >
+                        Próximamente
+                    </button>
+
+                </div>
+
+            </article>
+
+        </section>
+
+
+        <!-- PIE DE PÁGINA -->
+
+        <footer class="footer">
+            InvenSmart © 2026 - Sistema Inteligente de Gestión de Inventarios
+        </footer>
+
+    </main>
+
+</div>
+
+</body>
+</html>
