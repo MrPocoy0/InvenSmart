@@ -40,25 +40,23 @@
                 <span>▤</span> Productos
             </a>
 
-            <a href="#" class="nav-link">
+            <a href="{{ url_for('movement.list_movements') }}" class="nav-link">
                 <span>⇄</span> Movimientos
             </a>
 
-            <a href="#" class="nav-link">
+            <a href="{{ url_for('expiry.list_expirations') }}" class="nav-link">
                 <span>◷</span> Vencimientos
             </a>
 
             <span class="menu-label">GESTIÓN</span>
 
-            <a href="#" class="nav-link">
+            <a href="{{ url_for('alert.list_alerts') }}" class="nav-link">
                 <span>♧</span> Alertas
             </a>
 
-            <a href="#" class="nav-link">
-                <span>▥</span> Reportes
-            </a>
+            <a href="{{ url_for('report.index') }}" class="nav-link"><span>▥</span> Reportes</a>
 
-            <a href="#" class="nav-link">
+            <a href="{{ url_for('ai.assistant') }}" class="nav-link">
                 <span>✧</span> Asistente IA
             </a>
 
@@ -129,6 +127,8 @@
             <form method="POST"
                   action="{{ request.path }}"
                   class="product-form">
+
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                 <div class="form-grid">
 
@@ -222,7 +222,11 @@
                             step="1"
                             value="{{ request.form.get('stock', product.stock if product else '0') }}"
                             required
+                            {% if product %}readonly{% endif %}
                         >
+                        {% if product %}
+                            <small class="form-help">El stock se modifica mediante movimientos.</small>
+                        {% endif %}
 
                     </div>
 

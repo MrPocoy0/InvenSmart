@@ -12,23 +12,23 @@ InvenSmart es un sistema web académico para la gestión de inventarios y la pre
 - Registro, edición y eliminación de categorías.
 - Validaciones básicas de productos.
 - Consulta de productos vencidos y próximos a vencer dentro de 30 días.
+- Movimientos de entrada y salida con historial y trazabilidad de stock.
+- Alertas de stock bajo, agotado, vencido y próximo a vencer.
+- Detección automática de alertas mediante el comando Flask `check-alerts`, sin modificar datos.
+- Servicio Docker `scheduler` que ejecuta la detección al iniciar y cada 60 minutos.
+- Dashboard con indicadores calculados desde el inventario.
+- Asistente consultivo preparado para Google Gemini mediante API.
 - Dashboard visual responsive basado en tonos verdes.
 - Configuración de MySQL mediante variables de entorno.
-- Docker Compose para el servicio MySQL.
+- Docker Compose para Flask y MySQL, con volumen persistente y healthcheck.
 
 ### Parcial
 
-- El dashboard usa indicadores y alertas de demostración, no métricas calculadas del inventario real.
-- Docker Compose configura MySQL, pero no contiene un servicio Flask ni es un despliegue completo de la aplicación web.
-- `database/`, `docs/` y `tests/` existen, pero están vacíos.
-- `app/services/` existe como estructura inicial, sin servicios de negocio implementados.
+- La integración con Gemini requiere configurar una clave de Google; sin ella el asistente informa que no está configurado.
 
 ### Planificado
 
-- Movimientos de inventario e historial.
-- Alertas automáticas e indicadores basados en datos reales.
-- Integración de IA para recomendaciones justificadas.
-- Migraciones, pruebas automatizadas, Docker para Flask y CI/CD.
+- Despliegue real en un entorno externo y ejecución del flujo CI en GitHub.
 
 ## Tecnologías
 
@@ -41,11 +41,15 @@ InvenSmart es un sistema web académico para la gestión de inventarios y la pre
 
 - `app/models/`: modelos de datos.
 - `app/routes/`: rutas Flask.
-- `app/services/`: estructura reservada para servicios.
+- `app/services/`: lógica de inventario, alertas, dashboard y asistencia IA.
 - `app/static/css/`: estilos.
 - `app/templates/`: plantillas HTML/Jinja2.
-- `database/`, `docs/` y `tests/`: estructuras reservadas actualmente vacías.
-- `docker-compose.yml`: configuración actual de MySQL.
+- `database/`: estructura reservada para datos locales (no versionar).
+- `docs/`: documentación técnica, incluyendo el Prompt Engineering de Gemini.
+- `tests/`: pruebas automatizadas con SQLite en memoria.
+- `docker-compose.yml`: servicios Flask y MySQL.
+- `Dockerfile` / `.dockerignore`: imagen de la aplicación y exclusiones de contexto.
+- `.github/workflows/ci.yml`: pruebas y Ruff en GitHub Actions.
 - `main.py`: punto de entrada de desarrollo local.
 
 ## Configuración local preliminar
@@ -68,9 +72,38 @@ python main.py
 
 Este comando inicia Flask en modo de desarrollo local.
 
+### Automatización de alertas
+
+La detección reutiliza el servicio de alertas y realiza una consulta de solo lectura. Puede ejecutarse manualmente o desde una tarea programada externa:
+
+```powershell
+flask --app main.py check-alerts
+```
+
+El comando informa las cantidades de stock bajo, agotados, vencidos y próximos a vencer. No crea registros, no cambia stock y no registra movimientos. El dashboard y el asistente utilizan el mismo servicio para evitar duplicar lógica.
+
+En Docker, `scheduler` reutiliza la imagen de Flask y ejecuta la misma revisión inmediatamente al iniciar y luego cada 3600 segundos. Solo consulta inventario; si falla una ejecución, registra el error y continúa con el siguiente ciclo. Para iniciarlo sin tocar los demás servicios:
+
+```powershell
+docker compose --project-name proyecto_final_inventario_ia up -d scheduler
+docker compose --project-name proyecto_final_inventario_ia logs -f scheduler
+docker compose --project-name proyecto_final_inventario_ia stop scheduler
+```
+
 ## Docker
 
-`docker-compose.yml` configura actualmente MySQL 8.4 con volumen persistente y healthcheck. No configura todavía un servicio Flask.
+Requisitos: Docker Desktop y un `.env` local con valores válidos. El servicio `mysql` conserva el volumen `mysql_data`; `web` espera el healthcheck de MySQL y usa `MYSQL_HOST=invensmart_mysql` dentro de la red Docker existente.
+
+```powershell
+docker compose config
+docker compose up --build
+```
+
+La aplicación queda publicada en el puerto configurado por Compose. La imagen no ejecuta migraciones automáticamente. Para una base existente, realizar respaldo y revisión antes de aplicar manualmente `flask db upgrade` dentro del contenedor.
+
+## CI/CD
+
+GitHub Actions ejecuta en `main` y en pull requests: instala dependencias, ejecuta las pruebas con SQLite en memoria, valida Ruff y revisa el formato del diff. No utiliza MySQL, secretos de Gemini ni despliegues automáticos.
 
 ## Seguridad y recuperación
 

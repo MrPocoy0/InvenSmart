@@ -36,7 +36,7 @@
                 <span>▤</span> Productos
             </a>
 
-            <a href="#" class="nav-link">
+            <a href="{{ url_for('movement.list_movements') }}" class="nav-link">
                 <span>⇄</span> Movimientos
             </a>
 
@@ -52,15 +52,13 @@
                 <span>♧</span> Categorías
             </a>
 
-            <a href="#" class="nav-link">
+            <a href="{{ url_for('alert.list_alerts') }}" class="nav-link">
                 <span>♧</span> Alertas
             </a>
 
-            <a href="#" class="nav-link">
-                <span>▥</span> Reportes
-            </a>
+            <a href="{{ url_for('report.index') }}" class="nav-link"><span>▥</span> Reportes</a>
 
-            <a href="#" class="nav-link">
+            <a href="{{ url_for('ai.assistant') }}" class="nav-link">
                 <span>✧</span> Asistente IA
             </a>
 

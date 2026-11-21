@@ -11,6 +11,7 @@ venv/
 # Archivos temporales de Python
 __pycache__/
 *.py[cod]
+.pytest_cache/
 
 # Bases de datos, respaldos y archivos locales
 *.sql

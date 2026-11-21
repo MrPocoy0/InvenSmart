@@ -1,5 +1,49 @@
 
 services:
+  web:
+    build: .
+    container_name: invensmart_web
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      MYSQL_HOST: invensmart_mysql
+      FLASK_APP: main.py
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      GEMINI_MODEL: ${GEMINI_MODEL}
+      GEMINI_TIMEOUT: ${GEMINI_TIMEOUT}
+    ports:
+      - "5001:8000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - invensmart_network
+
+  scheduler:
+    image: proyecto_final_inventario_ia-web
+    container_name: invensmart_scheduler
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      MYSQL_HOST: invensmart_mysql
+      FLASK_APP: main.py
+    command: >-
+      sh -c 'while true; do
+      echo "[$$(date -Iseconds)] Iniciando detección de alertas";
+      if flask --app main.py check-alerts;
+      then echo "[$$(date -Iseconds)] Detección completada";
+      else echo "[$$(date -Iseconds)] Error en la detección; se reintentará en 3600 segundos" >&2;
+      fi;
+      sleep 3600;
+      done'
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - invensmart_network
+
   mysql:
     image: mysql:8.4
     container_name: invensmart_mysql
@@ -20,6 +64,13 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+    networks:
+      - invensmart_network
 
 volumes:
   mysql_data:
+
+networks:
+  invensmart_network:
+    external: true
+    name: proyecto_final_inventario_ia_default

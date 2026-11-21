@@ -15,6 +15,7 @@ from sqlalchemy import or_
 from app import db
 from app.models.product import Product
 from app.models.category import Category
+from app.models.inventory_movement import InventoryMovement
 
 
 product_bp = Blueprint(
@@ -102,9 +103,7 @@ def create_product():
                 )
 
             if stock < 0 or minimum_stock < 0:
-                raise ValueError(
-                    "El stock no puede ser negativo."
-                )
+                raise ValueError("El stock no puede ser negativo.")
 
             category = db.session.get(Category, category_id)
 
@@ -190,7 +189,6 @@ def edit_product(product_id):
                 request.form.get("sale_price", "0")
             )
 
-            stock = int(request.form.get("stock", "0"))
             minimum_stock = int(
                 request.form.get("minimum_stock", "5")
             )
@@ -219,10 +217,8 @@ def edit_product(product_id):
                     "Los precios no pueden ser negativos."
                 )
 
-            if stock < 0 or minimum_stock < 0:
-                raise ValueError(
-                    "El stock no puede ser negativo."
-                )
+            if minimum_stock < 0:
+                raise ValueError("El stock mínimo no puede ser negativo.")
 
             category = db.session.get(Category, category_id)
 
@@ -246,7 +242,6 @@ def edit_product(product_id):
             product.description = description or None
             product.purchase_price = purchase_price
             product.sale_price = sale_price
-            product.stock = stock
             product.minimum_stock = minimum_stock
             product.expiration_date = expiration_date
             product.category_id = category_id
@@ -290,6 +285,13 @@ def edit_product(product_id):
 )
 def delete_product(product_id):
     product = db.get_or_404(Product, product_id)
+
+    if InventoryMovement.query.filter_by(product_id=product.id).first():
+        flash(
+            "No se puede eliminar: el producto tiene movimientos registrados.",
+            "danger"
+        )
+        return redirect(url_for("product.list_products"))
 
     try:
         db.session.delete(product)

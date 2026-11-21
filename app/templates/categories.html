@@ -38,7 +38,7 @@
                 <span>▤</span> Productos
             </a>
 
-            <a href="#" class="nav-link">
+            <a href="{{ url_for('movement.list_movements') }}" class="nav-link">
                 <span>⇄</span> Movimientos
             </a>
 
@@ -54,15 +54,13 @@
                 <span>♧</span> Categorías
             </a>
 
-            <a href="#" class="nav-link">
+            <a href="{{ url_for('alert.list_alerts') }}" class="nav-link">
                 <span>♧</span> Alertas
             </a>
 
-            <a href="#" class="nav-link">
-                <span>▥</span> Reportes
-            </a>
+            <a href="{{ url_for('report.index') }}" class="nav-link"><span>▥</span> Reportes</a>
 
-            <a href="#" class="nav-link">
+            <a href="{{ url_for('ai.assistant') }}" class="nav-link">
                 <span>✧</span> Asistente IA
             </a>
 
@@ -137,6 +135,8 @@
 
             <form method="POST"
                   action="{{ url_for('category.create_category') }}">
+
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                 <div class="category-form-grid">
 
@@ -240,6 +240,8 @@
                                         action="{{ url_for('category.delete_category', category_id=category.id) }}"
                                         onsubmit="return confirm('¿Seguro que deseas eliminar esta categoría?');">
 
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
                                         <button
                                             type="submit"
                                             class="category-delete-button">
@@ -264,6 +266,8 @@
                                 <form
                                     method="POST"
                                     action="{{ url_for('category.edit_category', category_id=category.id) }}">
+
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                                     <div class="category-form-grid">
 

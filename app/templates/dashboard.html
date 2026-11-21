@@ -42,7 +42,7 @@
 <a href="{{ url_for('product.list_products') }}" class="nav-link">
     <span>▤</span> Productos
 </a>
-            <a href="#" class="nav-link">
+            <a href="{{ url_for('movement.list_movements') }}" class="nav-link">
                 <span>⇄</span>
                 Movimientos
             </a>
@@ -59,16 +59,16 @@
     <span>♧</span> Categorías
 </a>
 
-<a href="#" class="nav-link">
+<a href="{{ url_for('alert.list_alerts') }}" class="nav-link">
     <span>♧</span> Alertas
 </a>
 
-            <a href="#" class="nav-link">
+            <a href="{{ url_for('report.index') }}" class="nav-link">
                 <span>▥</span>
                 Reportes
             </a>
 
-            <a href="#" class="nav-link">
+            <a href="{{ url_for('ai.assistant') }}" class="nav-link">
                 <span>✧</span>
                 Asistente IA
             </a>
@@ -144,7 +144,7 @@
 
                 <span>Total de productos</span>
 
-                <h3>250</h3>
+                <h3>{{ total_products }}</h3>
 
                 <p>Productos registrados</p>
 
@@ -155,11 +155,11 @@
 
                 <div class="stat-icon green">✓</div>
 
-                <span>Stock disponible</span>
+                <span>Total de unidades</span>
 
-                <h3>185</h3>
+                <h3>{{ total_units }}</h3>
 
-                <p>Productos con existencias</p>
+                <p>Unidades en inventario</p>
 
             </article>
 
@@ -170,7 +170,7 @@
 
                 <span>Stock bajo</span>
 
-                <h3>12</h3>
+                <h3>{{ low_stock_count }}</h3>
 
                 <p>Requieren atención</p>
 
@@ -183,10 +183,24 @@
 
                 <span>Próximos a vencer</span>
 
-                <h3>8</h3>
+                <h3>{{ upcoming_count }}</h3>
 
                 <p>Requieren seguimiento</p>
 
+            </article>
+
+            <article class="stat-card">
+                <div class="stat-icon red">×</div>
+                <span>Sin stock</span>
+                <h3>{{ out_of_stock_count }}</h3>
+                <p>Productos agotados</p>
+            </article>
+
+            <article class="stat-card">
+                <div class="stat-icon red">◷</div>
+                <span>Vencidos</span>
+                <h3>{{ expired_count }}</h3>
+                <p>Requieren atención</p>
             </article>
 
         </section>
@@ -213,39 +227,63 @@
                         </p>
                     </div>
 
-                    <a href="#">Ver todas</a>
+                    <a href="{{ url_for('alert.list_alerts') }}">Ver todas</a>
 
                 </div>
 
 
+                {% for product in alerts.out_of_stock[:3] %}
                 <div class="alert-item">
 
                     <div class="alert-dot red-dot"></div>
 
                     <div>
-                        <strong>Leche evaporada</strong>
+                        <strong>{{ product.name }}</strong>
 
                         <p>
-                            Stock por debajo del mínimo
+                            El producto no tiene existencias
                         </p>
                     </div>
 
                     <span class="status danger">
+                        Sin stock
+                    </span>
+
+                </div>
+                {% endfor %}
+
+
+                {% for product in alerts.low_stock[:3] %}
+                <div class="alert-item">
+
+                    <div class="alert-dot orange-dot"></div>
+
+                    <div>
+                        <strong>{{ product.name }}</strong>
+
+                        <p>
+                            Stock igual o inferior al mínimo
+                        </p>
+                    </div>
+
+                    <span class="status warning">
                         Stock bajo
                     </span>
 
                 </div>
+                {% endfor %}
 
 
+                {% for product in alerts.upcoming[:3] %}
                 <div class="alert-item">
 
                     <div class="alert-dot orange-dot"></div>
 
                     <div>
-                        <strong>Yogurt natural</strong>
+                        <strong>{{ product.name }}</strong>
 
                         <p>
-                            Próximo a vencer en 4 días
+                            Vence en {{ (product.expiration_date - alerts.today).days }} días
                         </p>
                     </div>
 
@@ -254,25 +292,33 @@
                     </span>
 
                 </div>
+                {% endfor %}
 
+                {% if not alerts.out_of_stock and not alerts.low_stock and not alerts.upcoming %}
+                    <div class="empty-state">No hay alertas activas.</div>
+                {% endif %}
 
-                <div class="alert-item">
-
-                    <div class="alert-dot orange-dot"></div>
-
+                <div class="panel-header latest-movements-header">
                     <div>
-                        <strong>Queso fresco</strong>
-
-                        <p>
-                            Próximo a vencer en 6 días
-                        </p>
+                        <h3>Últimos movimientos</h3>
+                        <p>Actividad reciente del inventario</p>
                     </div>
-
-                    <span class="status warning">
-                        Vencimiento
-                    </span>
-
+                    <a href="{{ url_for('movement.list_movements') }}">Ver historial</a>
                 </div>
+                {% for movement in latest_movements %}
+                    <div class="alert-item">
+                        <div class="alert-dot {% if movement.movement_type == 'entry' %}orange-dot{% else %}red-dot{% endif %}"></div>
+                        <div>
+                            <strong>{{ movement.product.name }}</strong>
+                            <p>{{ movement.created_at.strftime('%d/%m/%Y %H:%M') }} · {{ movement.quantity }} unidades</p>
+                        </div>
+                        <span class="status {% if movement.movement_type == 'entry' %}available{% else %}warning{% endif %}">
+                            {% if movement.movement_type == 'entry' %}Entrada{% else %}Salida{% endif %}
+                        </span>
+                    </div>
+                {% else %}
+                    <div class="empty-state">No hay movimientos registrados.</div>
+                {% endfor %}
 
             </article>
 
@@ -308,13 +354,7 @@
                         recomendaciones personalizadas.
                     </p>
 
-                    <button
-                        type="button"
-                        class="primary-button"
-                        disabled
-                    >
-                        Próximamente
-                    </button>
+                    <a href="{{ url_for('ai.assistant') }}" class="primary-button">Abrir asistente</a>
 
                 </div>
 

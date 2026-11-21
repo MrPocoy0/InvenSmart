@@ -1,0 +1,4 @@
+Migrations for InvenSmart are managed with Flask-Migrate and Alembic.
+
+Review every migration before applying it to a real database. Never run an
+upgrade without a current database backup.

@@ -36,5 +36,12 @@ class Product(db.Model):
         back_populates="products"
     )
 
+    movements = db.relationship(
+        "InventoryMovement",
+        back_populates="product",
+        lazy=True,
+        passive_deletes=True
+    )
+
     def __repr__(self):
         return f"<Product {self.name}>"

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InvenSmart | Asistente IA</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="app-container">
+    <aside class="sidebar"><div class="brand"><div class="brand-icon">I</div><div><h2>InvenSmart</h2><span>Gestión inteligente</span></div></div><nav class="navigation"><span class="menu-label">PRINCIPAL</span><a href="{{ url_for('main.home') }}" class="nav-link"><span>▦</span> Dashboard</a><a href="{{ url_for('product.list_products') }}" class="nav-link"><span>▤</span> Productos</a><a href="{{ url_for('movement.list_movements') }}" class="nav-link"><span>⇄</span> Movimientos</a><a href="{{ url_for('expiry.list_expirations') }}" class="nav-link"><span>◷</span> Vencimientos</a><span class="menu-label">GESTIÓN</span><a href="{{ url_for('category.list_categories') }}" class="nav-link"><span>♧</span> Categorías</a><a href="{{ url_for('alert.list_alerts') }}" class="nav-link"><span>!</span> Alertas</a><a href="{{ url_for('report.index') }}" class="nav-link"><span>▥</span> Reportes</a><a href="{{ url_for('ai.assistant') }}" class="nav-link active"><span>✧</span> Asistente IA</a></nav><div class="sidebar-footer"><span>Proyecto académico</span><strong>InvenSmart v1.0</strong></div></aside>
+    <main class="main-content ai-page">
+        <header class="topbar">
+            <div><span class="eyebrow">ANÁLISIS INTELIGENTE</span><h1>Asistente IA</h1><p>Recomendaciones de inventario con Google Gemini</p></div>
+            <a href="{{ url_for('main.home') }}" class="primary-button">Volver al dashboard</a>
+        </header>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}<div class="ai-message {{ category }}">{{ message }}</div>{% endfor %}
+        {% endwith %}
+        <section class="ai-layout">
+            <article class="panel ai-query-panel">
+                <div class="ai-panel-heading"><div class="ai-icon">✧</div><div><span class="ai-label">GEMINI</span><h2>Consulta tu inventario</h2><p>Pregunta por riesgos, reposición, vencimientos o alertas.</p></div></div>
+                <form method="post" class="ai-query-form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <label for="question">Tu pregunta</label>
+                    <textarea id="question" name="question" maxlength="1000" required placeholder="Ejemplo: ¿Qué productos requieren atención prioritaria?">{{ question }}</textarea>
+                    <div class="query-footer"><span>Máximo 1000 caracteres · La IA no modifica existencias.</span><button class="primary-button" type="submit">Analizar inventario</button></div>
+                </form>
+                <div class="suggestion-list"><strong>Preguntas sugeridas</strong><div><span>Riesgos de vencimiento</span><span>Productos para reponer</span><span>Resumen de alertas</span></div></div>
+            </article>
+            <article class="panel ai-result-panel">
+                <div class="panel-header"><div><span class="eyebrow">RESULTADO DEL ANÁLISIS</span><h2>Recomendaciones de la IA</h2><p>La respuesta se basa en el contexto real disponible.</p></div><span class="status available">Solo lectura</span></div>
+                {% if answer %}<div id="ai-answer" class="ai-answer" aria-live="polite"></div><pre id="ai-answer-source" class="visually-hidden">{{ answer }}</pre>
+                {% else %}<div class="ai-empty"><div class="ai-empty-icon">✦</div><h3>Tu análisis aparecerá aquí</h3><p>Realiza una consulta para obtener un resumen, riesgos y acciones preventivas organizadas por secciones.</p></div>{% endif %}
+            </article>
+        </section>
+    </main>
+</div>
+{% if answer %}<script>
+(() => {
+    const source = document.getElementById('ai-answer-source'); const target = document.getElementById('ai-answer');
+    const inline = (text, parent) => text.split(/(\*\*[^*]+\*\*)/g).forEach(part => { if (part.startsWith('**') && part.endsWith('**')) { const strong = document.createElement('strong'); strong.textContent = part.slice(2, -2); parent.appendChild(strong); } else parent.appendChild(document.createTextNode(part)); });
+    source.textContent.split(/\r?\n/).forEach(line => { const trimmed = line.trim(); if (!trimmed) { target.appendChild(document.createElement('div')).className = 'answer-spacer'; return; } let node;
+        if (/^#{1,3}\s+/.test(trimmed)) { node = document.createElement(trimmed.startsWith('# ') ? 'h3' : 'h4'); inline(trimmed.replace(/^#{1,3}\s+/, ''), node); node.className = 'answer-heading'; }
+        else if (/^[-*]\s+/.test(trimmed) || /^\d+[.)]\s+/.test(trimmed)) { node = document.createElement('li'); inline(trimmed.replace(/^([-*]|\d+[.)])\s+/, ''), node); node.className = 'answer-list-item'; }
+        else { node = document.createElement('p'); inline(trimmed, node); }
+        if (node.tagName === 'LI') { let list = target.lastElementChild; if (!list || !['UL', 'OL'].includes(list.tagName)) { list = document.createElement(/^\d+[.)]/.test(trimmed) ? 'ol' : 'ul'); list.className = 'answer-list'; target.appendChild(list); } list.appendChild(node); } else target.appendChild(node);
+    });
+})();
+</script>{% endif %}
+</body>
+</html>
