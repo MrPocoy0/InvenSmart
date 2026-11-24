@@ -1,3 +1,5 @@
+### By: Sony Cruz Vargas
+
 # InvenSmart
 
 InvenSmart es un sistema web académico para la gestión de inventarios y la prevención de pérdidas. Utiliza Python, Flask, SQLAlchemy, MySQL, HTML, CSS y JavaScript.
