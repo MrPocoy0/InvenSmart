@@ -1,4 +1,4 @@
-### By: Sony Cruz Vargas
+### By: Sony Cruz
 
 # InvenSmart
 
